@@ -213,8 +213,8 @@ class VideoLDM(pl.LightningModule):
         pixel_values = rearrange(videos, "B F C W H -> (B F) C W H")
         latents = self.vae.encode(pixel_values).latent_dist.sample() * self.vae.config.scaling_factor
         latents = rearrange(latents, "(B F) C W H -> B C F W H", B=videos.shape[0], F=video_length)
-        input_frames_conditioning = videos[:, -self.unet_params.num_control_input_frames:].detach().clone()
-        input_frames = videos[:, self.unet_params.num_control_input_frames:].detach().clone()
+        input_frames_conditioning = videos[:, :self.unet_params.num_frame_conditioning].detach().clone()
+        input_frames = videos[:, - self.unet_params.num_control_input_frames:].detach().clone()
 
         self.img_cond_resampler = self.resampler if self.unet_params.use_resampler else None
         self.img_cond_encoder = self.image_encoder if self.unet_params.use_resampler else None
